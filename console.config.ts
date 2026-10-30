@@ -1,9 +1,24 @@
 import { defineConsoleConfig } from "@hot-updater/console";
+import { firebaseDatabase, firebaseStorage } from "@hot-updater/firebase";
+import { apiKeys, insights, remoteConfig } from "@hot-updater/server/plugins";
+import { applicationDefault, cert } from "firebase-admin/app";
 
-// Set the database, storage, and plugins your server runs, with adapters that
-// run on your Nitro runtime. See examples/README.md for provider configurations.
 export default defineConsoleConfig(() => {
-  throw new Error(
-    "Set database, storage, and plugins in console.config.ts, as your server is configured, before running the console.",
-  );
+  // Use a service identity or mounted credential file where available.
+  // Serverless hosts can supply the service-account JSON as a runtime secret.
+  const credential = process.env.FIREBASE_SERVICE_ACCOUNT_JSON
+    ? cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_JSON))
+    : applicationDefault();
+  const projectId = process.env.FIREBASE_PROJECT_ID!;
+
+  return {
+    database: firebaseDatabase({ projectId, credential }),
+    storage: firebaseStorage({
+      projectId,
+      credential,
+      storageBucket: process.env.FIREBASE_STORAGE_BUCKET!,
+    }),
+    // The plugins the managed Firebase server runs: API keys, Insights, and Remote Config.
+    plugins: [apiKeys(), insights(), remoteConfig()],
+  };
 });

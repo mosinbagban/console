@@ -22,7 +22,8 @@
   },
   "dependencies": {
     "@hot-updater/console": "1.1.5",
-    "@hot-updater/server": "1.1.5",
+    "@hot-updater/firebase": "^1.1.5",
+    "@hot-updater/server": "^1.1.5",
     "better-auth": "^1.6.23",
     "react": "^19.2.4",
     "react-dom": "^19.2.4"
